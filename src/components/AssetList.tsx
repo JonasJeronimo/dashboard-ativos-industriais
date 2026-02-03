@@ -1,38 +1,45 @@
-// Importamos o tipo Asset para garantir tipagem forte.
-// Isso evita erros e deixa claro o que o componente espera receber.
+// Importamos apenas o tipo Asset.
+// `import type` garante que isso não vire código JavaScript no build.
 import type { Asset } from '../types/asset'
-// 'import type' evita erros de runtime por ser TypeScript
 
-// Definimos explicitamente as props do componente.
-// AssetList NÃO cria dados, apenas recebe.
+// Props do componente:
+// recebe uma lista de ativos já pronta para exibição.
 interface AssetListProps {
   assets: Asset[]
 }
 
-// Componente funcional simples (padrão moderno do React).
-// Nada de React.FC.
+// Componente responsável apenas por exibir a listagem.
+// Não busca dados, não gerencia estado, não aplica regras de negócio.
 export function AssetList({ assets }: AssetListProps) {
-  // Caso a lista venha vazia, mostramos uma mensagem amigável.
-  // Isso evita renderizações quebradas e melhora UX.
+  // Caso não existam ativos, exibimos um feedback simples ao usuário.
   if (assets.length === 0) {
     return <p>Nenhum ativo encontrado.</p>
   }
 
-  // Renderização principal da lista
   return (
-    <ul>
-      {/* Iteramos sobre os ativos recebidos */}
-      {assets.map((asset) => (
-        // key é obrigatória para listas no React
-        <li key={asset.id}>
-          {/* Nome do ativo */}
-          <strong>{asset.nome}</strong>
+    // Tabela semântica para exibição de dados estruturados
+    <table>
+      {/* Cabeçalho da tabela define as colunas */}
+      <thead>
+        <tr>
+          <th>Nome do ativo</th>
+          <th>Status</th>
+        </tr>
+      </thead>
 
-          {/* Status do ativo */}
-          {' — '}
-          {asset.status}
-        </li>
-      ))}
-    </ul>
+      {/* Corpo da tabela com os dados */}
+      <tbody>
+        {assets.map((asset) => (
+          // Cada linha representa um ativo
+          <tr key={asset.id}>
+            {/* Coluna: nome do ativo */}
+            <td>{asset.nome}</td>
+
+            {/* Coluna: status do ativo */}
+            <td>{asset.status}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
