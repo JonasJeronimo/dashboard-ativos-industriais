@@ -1,25 +1,26 @@
-// Importamos apenas o tipo Asset.
-// `import type` garante que isso não vire código JavaScript no build.
+// Importamos o tipo Asset para tipagem forte
 import type { Asset } from '../types/asset'
 
-// Props do componente:
-// recebe uma lista de ativos já pronta para exibição.
+// Hook de navegação do React Router
+import { useNavigate } from 'react-router-dom'
+
+// Props do componente
 interface AssetListProps {
   assets: Asset[]
 }
 
-// Componente responsável apenas por exibir a listagem.
-// Não busca dados, não gerencia estado, não aplica regras de negócio.
+// Componente responsável apenas por exibir a listagem
 export function AssetList({ assets }: AssetListProps) {
-  // Caso não existam ativos, exibimos um feedback simples ao usuário.
+  // Hook que permite navegar programaticamente
+  const navigate = useNavigate()
+
+  // Caso não existam ativos
   if (assets.length === 0) {
     return <p>Nenhum ativo encontrado.</p>
   }
 
   return (
-    // Tabela semântica para exibição de dados estruturados
     <table>
-      {/* Cabeçalho da tabela define as colunas */}
       <thead>
         <tr>
           <th>Nome do ativo</th>
@@ -27,15 +28,16 @@ export function AssetList({ assets }: AssetListProps) {
         </tr>
       </thead>
 
-      {/* Corpo da tabela com os dados */}
       <tbody>
         {assets.map((asset) => (
-          // Cada linha representa um ativo
-          <tr key={asset.id}>
-            {/* Coluna: nome do ativo */}
+          <tr
+            key={asset.id}
+            // Ao clicar na linha, navegamos para o detalhe do ativo
+            onClick={() => navigate(`/assets/${asset.id}`)}
+            // Cursor ajuda o usuário a entender que é clicável
+            style={{ cursor: 'pointer' }}
+          >
             <td>{asset.nome}</td>
-
-            {/* Coluna: status do ativo */}
             <td>{asset.status}</td>
           </tr>
         ))}
