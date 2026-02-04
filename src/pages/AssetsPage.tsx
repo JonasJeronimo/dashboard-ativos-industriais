@@ -1,67 +1,76 @@
-// Importamos o hook de estado do React
+// Hook de estado do React
 import { useState } from 'react'
 
-// Importamos o componente responsável por renderizar a lista.
-// A page apenas orquestra, não renderiza item por item.
+// Componente de listagem
 import { AssetList } from '../components/AssetList'
 
-// Importamos o tipo Asset para tipar os dados mockados.
+// Tipagem dos ativos
 import type { Asset } from '../types/asset'
-// 'import type' evita que isso vire código JavaScript no build
 
 export function AssetsPage() {
-  // Dados mockados simulando ativos industriais.
-  // Em um cenário real, isso viria de uma API.
+  // Dados mockados simulando ativos industriais
   const assets: Asset[] = [
     { id: '1', nome: 'Motor Principal', status: 'operacional' },
     { id: '2', nome: 'Bomba Hidráulica', status: 'manutencao' },
     { id: '3', nome: 'Compressor de Ar', status: 'parado' },
-    // você pode duplicar depois pra testar várias páginas
+    // depois você pode duplicar pra testar várias páginas
   ]
 
-  // Estado que controla a página atual
+  // Página atual
   const [currentPage, setCurrentPage] = useState(1)
 
-  // Quantidade fixa de itens por página
+  // Quantidade de itens por página
   const itemsPerPage = 10
 
-  // Índice inicial do recorte
+  // Cálculo dos índices do recorte
   const startIndex = (currentPage - 1) * itemsPerPage
-
-  // Índice final do recorte
   const endIndex = startIndex + itemsPerPage
 
-  // Ativos que serão exibidos na página atual
+  // Ativos visíveis na página atual
   const paginatedAssets = assets.slice(startIndex, endIndex)
 
   // Total de páginas
   const totalPages = Math.ceil(assets.length / itemsPerPage)
+
+  // Criamos um array com os números das páginas
+  // Ex: [1, 2, 3]
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
 
   return (
     <main>
       {/* Título da página */}
       <h1>Ativos Industriais</h1>
 
-      {/* Lista recebe apenas os ativos da página atual */}
+      {/* Lista recebe apenas os itens da página atual */}
       <AssetList assets={paginatedAssets} />
 
       {/* Controles de paginação */}
-      <nav>
+      <nav style={{ marginTop: '16px' }}>
+        {/* Botão anterior */}
         <button
-          // Não permite voltar da primeira página
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((prev) => prev - 1)}
         >
           Anterior
         </button>
 
-        {/* Indicador simples de página */}
-        <span>
-          Página {currentPage} de {totalPages}
-        </span>
+        {/* Paginação numérica */}
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => setCurrentPage(page)}
+            // Destacamos visualmente a página ativa
+            style={{
+              fontWeight: page === currentPage ? 'bold' : 'normal',
+              marginInline: '4px',
+            }}
+          >
+            {page}
+          </button>
+        ))}
 
+        {/* Botão próxima */}
         <button
-          // Não permite avançar além da última página
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((prev) => prev + 1)}
         >
