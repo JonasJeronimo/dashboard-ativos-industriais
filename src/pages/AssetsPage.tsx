@@ -1,14 +1,17 @@
-// Hook de estado do React
-import { useState } from 'react'
-
-// Componente de listagem
+// Importamos o componente de listagem de ativos.
+// Ele é responsável apenas por renderizar a tabela.
 import { AssetList } from '../components/AssetList'
 
 // Tipagem dos ativos
 import type { Asset } from '../types/asset'
 
+// Importamos nosso hook profissional de paginação.
+// Ele centraliza toda a lógica de paginação fora da page.
+import { usePagination } from '../hooks/usePagination'
+
 export function AssetsPage() {
-  // Dados mockados simulando ativos industriais
+  // Dados mockados simulando ativos industriais.
+  // Em breve isso virá de uma API.
   const assets: Asset[] = [
     { id: '1', nome: 'Motor Principal', status: 'operacional' },
     { id: '2', nome: 'Bomba Hidráulica', status: 'manutencao' },
@@ -16,40 +19,35 @@ export function AssetsPage() {
     // depois você pode duplicar pra testar várias páginas
   ]
 
-  // Página atual
-  const [currentPage, setCurrentPage] = useState(1)
-
-  // Quantidade de itens por página
-  const itemsPerPage = 10
-
-  // Cálculo dos índices do recorte
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-
-  // Ativos visíveis na página atual
-  const paginatedAssets = assets.slice(startIndex, endIndex)
-
-  // Total de páginas
-  const totalPages = Math.ceil(assets.length / itemsPerPage)
-
-  // Criamos um array com os números das páginas
-  // Ex: [1, 2, 3]
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
+  // Chamamos o hook de paginação.
+  // Toda a inteligência de paginação agora mora nele.
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    nextPage,
+    prevPage,
+    goToPage,
+    pages,
+  } = usePagination({
+    data: assets,
+    itemsPerPage: 10,
+  })
 
   return (
     <main>
       {/* Título da página */}
       <h1>Ativos Industriais</h1>
 
-      {/* Lista recebe apenas os itens da página atual */}
-      <AssetList assets={paginatedAssets} />
+      {/* Lista recebe apenas os itens já paginados */}
+      <AssetList assets={paginatedData} />
 
       {/* Controles de paginação */}
       <nav style={{ marginTop: '16px' }}>
-        {/* Botão anterior */}
+        {/* Botão página anterior */}
         <button
           disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
+          onClick={prevPage}
         >
           Anterior
         </button>
@@ -58,8 +56,8 @@ export function AssetsPage() {
         {pages.map((page) => (
           <button
             key={page}
-            onClick={() => setCurrentPage(page)}
-            // Destacamos visualmente a página ativa
+            onClick={() => goToPage(page)}
+            // Destacamos a página atual
             style={{
               fontWeight: page === currentPage ? 'bold' : 'normal',
               marginInline: '4px',
@@ -69,10 +67,10 @@ export function AssetsPage() {
           </button>
         ))}
 
-        {/* Botão próxima */}
+        {/* Botão próxima página */}
         <button
           disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
+          onClick={nextPage}
         >
           Próxima
         </button>
